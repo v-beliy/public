@@ -309,11 +309,11 @@ fi
 # Создаем скрипт postinstall.sh
 echo -e "#!/bin/bash
 adduser user <<EOF
-Tropik500
-Tropik500
+RegularPass
+RegularPass
 EOF
 echo $? > /root/postinstall.log | echo -e "n\Regular user log" >> /root/postinstall.log
-passwd tkadmin <<EOF
+passwd admin <<EOF
 Admin$tandartP@ss
 Admin$tandartP@ss
 EOF
@@ -393,17 +393,6 @@ if [[ "$?" -eq "0" ]]
   echo -e "The postinstall.sh has NOT created!" && echo -e "The postinstall.sh has NOT created!" >> /root/deploying-pxe.log
   exit 1
 fi
-# Перезаписываем конфиг ocsinventory-agent
-echo -e "Trying write ocsinventory-agent's config-file"
-sleep 2
-echo -e 'server=http://ocs.tropikltd.com/ocsinventory' > /srv/tftp/images/mint18/extra/ocsinventory-agent.cfg
-if [[ "$?" -eq "0" ]]
- then
-  echo -e "ocsinventory-agent's config-file has been writed!" && echo -e "ocsinventory-agent's config-file has been writed!" >> /root/deploying-pxe.log
- else
-  echo -e "ocsinventory-agent's config-file has NOT writed!" && echo -e "ocsinventory-agent's config-file has NOT writed!" >> /root/deploying-pxe.log
-  exit 1
-fi
 # Создаем сценарий установки Минта
 echo -e "Trying write Linux Mint instalation instruction"
 sleep 2
@@ -429,9 +418,9 @@ d-i partman/confirm boolean true
 d-i partman/confirm_nooverwrite boolean true
 
 # Account setup
-d-i passwd/user-fullname string tkadmin
+d-i passwd/user-fullname string admin
 d-i netcfg/get_hostname string mint-64bit
-d-i passwd/username string tkadmin
+d-i passwd/username string admin
 d-i passwd/user-password string 1
 d-i passwd/user-password-again string 1
 d-i passwd/auto-login boolean false
@@ -445,7 +434,7 @@ ubiquity ubiquity/use_nonfree boolean true
 ubiquity ubiquity/success_command string apt-get update -y; \
 in-target wget -P /root/ https://download.teamviewer.com/download/linux/teamviewer_amd64.deb; \
 in-target wget -P /root/ https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb; \
-in-target apt-get install -y ssh mc ncdu vim htop iftop screen tmux pv remmina remmina-plugin-rdp ocsinventory-agent; \
+in-target apt-get install -y ssh mc ncdu vim htop iftop screen tmux pv remmina remmina-plugin-rdp \
 in-target apt-get install -y /root/teamviewer_amd64.deb; \
 in-target apt-get install -y /root/google-chrome-stable_current_amd64.deb; \
 cp -R /cdrom/extra/* /target/root/; \
@@ -549,14 +538,6 @@ if [[ "$?" -eq "0" ]]
   echo -e "The nfs-kernel-server has NOT restarted!" && echo -e "The nfs-kernel-server has NOT restarted!" >> /root/deploying-pxe.log
   exit 1
 fi
-# На всякий случай для контроля трафика устанавливаем iftop:
-echo -e "Trying install iftop"
-sleep 2
-apt install -y iftop
-if [[ "$?" -eq "0" ]]
- then
-  echo -e "iftop has been insta
-
 # Чтоб посмотреть что расшарено по nfs, можно выполнить:
 # showmount -e 192.168.1.1
 # где 192.168.1.1 - это IP сервера с nfs-шарой
